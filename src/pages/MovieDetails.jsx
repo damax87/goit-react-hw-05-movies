@@ -1,25 +1,79 @@
-import { useParams } from "react-router-dom";
-import { getMovieById } from "../fakeAPI";
+import { Suspense } from "react";
+import { Link, Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import * as API from "../API";
 
-export const MovieDetails = () => {
-  const { id } = useParams();
-  const movie = getMovieById(id);
+const MovieDetails = () => {
+  const useMovieDetails = movieId => {
+    const [movieDetails, setMovieDetails] = useState([]);
+  
+    useEffect(() => {
+      API.getMovieDetails(movieId).then(movieDetailsReturnedFromApi => setMovieDetails(movieDetailsReturnedFromApi));
+    }, [movieId]);
+  
+    return { movieDetails };
+  };
+
+    const { movieId } = useParams();
+    const { movieDetails } = useMovieDetails(movieId);
+
+
+  const location = useLocation();
+  const backLinkHref = location.state?.from ?? '/';
+
   return (
-    <main>
-      <img src="https://via.placeholder.com/960x240" alt="" />
-      <div>
-        <h2>
-          Movie - {movie.name} - {id}
-        </h2>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Doloribus
-          sunt excepturi nesciunt iusto dignissimos assumenda ab quae cupiditate
-          a, sed reprehenderit? Deleniti optio quasi, amet natus reiciendis
-          atque fuga dolore? Lorem, ipsum dolor sit amet consectetur adipisicing
-          elit. Impedit suscipit quisquam incidunt commodi fugiat aliquam
-          praesentium ipsum quos unde voluptatum?
-        </p>
-      </div>
-    </main>
+    <div>
+      <Link to={backLinkHref}>
+        {' '}
+        <button type="button">Go back</button>
+      </Link>
+
+      <h2>
+        {movieDetails.title} (
+        {movieDetails.release_date
+          ? movieDetails.release_date.substring(0, 4)
+          : ''}
+        )
+      </h2>
+
+      <img
+        src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${movieDetails.poster_path}`}
+        alt="{movieDetails.original_title}"
+      />
+
+      <p>
+        User Score:{' '}
+        {movieDetails.vote_average
+          ? Math.fround(movieDetails.vote_average * 10).toFixed(0)
+          : ''}
+        %
+      </p>
+      <h3>Overview</h3>
+      <p>{movieDetails.overview}</p>
+
+      <h4>Genres</h4>
+      <p>
+        {movieDetails.genres
+          ? movieDetails.genres.map(genre => genre.name).join(' ')
+          : ''}
+      </p>
+
+      <p>Additional information</p>
+        <ul>
+        <li>
+          <Link to="cast">Cast</Link>
+        </li>
+        <li>
+          <Link to="reviews">Reviews</Link>
+        </li>
+      </ul>
+      <Suspense fallback={<div>Loading subpage...</div>}>
+        <Outlet />
+      </Suspense>
+    
+    </div>
   );
 };
+
+export default MovieDetails;

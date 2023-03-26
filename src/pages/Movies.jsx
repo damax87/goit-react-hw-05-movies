@@ -1,11 +1,13 @@
-import { MovieList } from "../components/MovieList";
-import { getMovies } from "../fakeAPI";
+import SearchForm from "../components/SearchForm";
 
-export const Movies = () => {
-  const movies = getMovies();
+const Movies = () => {
+
+
   return (
     <main>
-      <MovieList movies={movies} />
+      <SearchForm />
     </main>
   );
 };
+
+export default Movies;

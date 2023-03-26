@@ -1,13 +1,22 @@
-export const Home = () => {
-    return (
-      <main>
-        <h1>Welcome</h1>
-        <img src="https://via.placeholder.com/960x240" alt="" />
-        <p>
-          Lorem, ipsum dolor sit amet consectetur adipisicing elit. Iusto,
-          laboriosam placeat incidunt rem illum animi nemo quibusdam quia
-          voluptatum voluptate.
-        </p>
-      </main>
-    );
-  };
+import { useEffect, useState } from "react";
+import * as API from "../API";
+import { TrendingList } from "components/TrendingList";
+
+const Home = () => {
+
+  const useTrendingList = () => {
+    const [trendingMovies, setMovies] = useState([]);
+  
+    useEffect(() => {
+      API.getTrending().then(response => setMovies(response));
+    }, []);
+  
+    return { trendingMovies };
+  };  
+  const { trendingMovies }  = useTrendingList();
+  return (
+    <div>
+      <TrendingList movies={trendingMovies} />
+    </div>
+  );}
+  export default Home;
